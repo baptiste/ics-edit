@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>ICS event editor</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Small edit tool for calendar files</p>
+      <h1>ICS event editor<span aria-hidden="true">.</span></h1>
+      <p class="intro">Open a file, edit, add, or delete an event, then download a copy. All data stays in browser.</p>
+    </header>
+
+    <section class="panel file-panel" aria-labelledby="file-heading">
+      <div>
+        <h2 id="file-heading">1. Open your calendar file</h2>
+        <p>Use an existing <code>.ics</code> file, up to 10 MB.</p>
+      </div>
+      <label class="file-button">
+        Open .ics file
+        <input id="file" type="file" accept=".ics,text/calendar" aria-label="Open .ics file">
+      </label>
+      <p id="file-status" class="file-status" role="status">No file opened</p>
+    </section>
+
+    <div id="error" class="notice error" role="alert" hidden></div>
+    <noscript><p class="notice error">Enable JavaScript to edit calendar files locally.</p></noscript>
+
+    <section id="calendar-preview" class="panel calendar-preview" aria-labelledby="agenda-heading" hidden>
+      <div class="section-heading">
+        <h2 id="agenda-heading"></h2>
+        <div class="day-navigation">
+          <button id="previous-day" class="secondary" type="button" aria-label="Previous event day">&larr;</button>
+          <button id="next-day" class="secondary" type="button" aria-label="Next event day">&rarr;</button>
+        </div>
+      </div>
+      <div id="agenda-events"></div>
+      <p id="undated-events" class="hint"></p>
+      <p class="hint">Read-only agenda, grouped by start date and wall-clock time. Times stay in their original zones, not your device's zone. Repeating occurrences are not expanded. All-day events appear on their start date.</p>
+    </section>
+
+    <section id="editor" class="panel" aria-labelledby="edit-heading" hidden>
+      <div class="section-heading">
+        <h2 id="edit-heading">2. Edit an event</h2>
+        <span id="draft-status" class="badge">No changes</span>
+      </div>
+      <div class="event-actions">
+        <button id="add-event" type="button" class="secondary">Add event</button>
+        <button id="delete-event" type="button" class="secondary">Delete selected event</button>
+        <button id="reset" type="button" class="secondary" aria-describedby="reset-help">Reset selected event</button>
+      </div>
+      <p id="reset-help" class="hint">Reset discards field edits for the selected event only. Other events, additions, and deletions are unchanged.</p>
+      <p id="empty-calendar" class="hint" hidden>This calendar has no events. Add one, or download the empty calendar.</p>
+      <div id="event-picker">
+        <label for="event">Event</label>
+        <select id="event"></select>
+        <p class="hint">Changes stay in this tab when you switch events. The download includes all your edits.</p>
+      </div>
+
+      <div id="warnings" class="notice warning" hidden>
+        <h3>Before you edit</h3>
+        <ul id="warning-list"></ul>
+      </div>
+
+      <form id="event-form">
+        <div id="event-fields">
+        <label for="title">Title</label>
+        <input id="title" name="title" type="text" autocomplete="off">
+
+        <fieldset id="dates">
+          <legend>Date &amp; time</legend>
+          <label class="checkbox-label">
+            <input id="all-day" name="allDay" type="checkbox">
+            All-day event
+          </label>
+          <div class="date-grid">
+            <div>
+              <label for="start">Start</label>
+              <input id="start" name="start" type="datetime-local" step="1">
+            </div>
+            <div>
+              <label id="end-label" for="end">End (optional)</label>
+              <input id="end" name="end" type="datetime-local" step="1" aria-describedby="end-help">
+            </div>
+          </div>
+          <p id="end-help" class="hint">An empty end keeps the event without an explicit end. Existing duration is preserved.</p>
+          <label for="zone">Time zone</label>
+          <select id="zone" name="zone" aria-describedby="zone-help zone-summary"></select>
+          <p id="zone-summary" class="hint"></p>
+          <p id="zone-help" class="hint">Times are shown exactly as written, not in your device's zone. Changing the zone keeps the displayed clock times; it does not convert them. Named zones must be defined in this file.</p>
+        </fieldset>
+
+        <label for="location">Location</label>
+        <input id="location" name="location" type="text" autocomplete="off">
+
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="6"></textarea>
+        </div>
+
+        <div class="actions">
+          <button id="download" type="submit">Download updated .ics</button>
+          <button id="download-zip" type="button" class="secondary">Download individual events (.zip)</button>
+        </div>
+        <p class="hint">Downloads a new file. The original file is never overwritten. ZIP contains one stored event per ICS, including its calendar metadata and time zones; recurring exceptions remain exceptions, not standalone occurrences.</p>
+        <p id="download-status" role="status"></p>
+      </form>
+    </section>
+
+    <footer>
+ <details>
+        <p>No accounts. No uploads. No calendar sync.</p>
+      <p>Untouched properties, events, time-zone definitions, and alarms stay in the file. This is an event editor, not an invitation or recurrence manager.</p>
+     
+        <summary>Information about the app</summary>
+        <p>ical.js parses the file and serializes edited properties. Only the original lines for changed fields are replaced; all other lines stay untouched, including UID, recurrence rules, attendees, and custom properties.</p>
+        <p>Recurring events are not expanded. Editing a master does not adjust its exceptions. Date and time-zone changes that cannot be interpreted safely are blocked, not guessed.</p>
+      </details>
+    </footer>
+  </main>
+</body>
+</html>

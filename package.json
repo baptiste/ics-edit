@@ -1,0 +1,14 @@
+{
+  "name": "ics-event-editor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "vendor": "node scripts/vendor.mjs",
+    "test": "node --test tests/*.test.js",
+    "serve": "node scripts/serve.mjs"
+  },
+  "dependencies": {
+    "ical.js": "2.2.1"
+  }
+}
